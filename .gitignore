@@ -134,3 +134,25 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+
+
+
+# Python / Django
+backend/venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.sqlite3
+
+# Environment variables
+.env
+*.env
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
