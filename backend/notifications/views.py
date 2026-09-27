@@ -11,18 +11,26 @@ from .serializers import NotificationSerializer
 @permission_classes([IsAuthenticated])
 def notification_list(request):
 
-    # Always use the logged-in user's ID
     user_id = str(request.user.id)
 
     notifications = Notification.objects(
         user_id=user_id
     ).order_by("-created_at")
 
+    unread_count = Notification.objects(
+        user_id=user_id,
+        is_read=False
+    ).count()
+
     return Response(
-        NotificationSerializer(
-            notifications,
-            many=True
-        ).data
+        {
+            "notifications": NotificationSerializer(
+                notifications,
+                many=True
+            ).data,
+            "unread_count": unread_count
+        },
+        status=status.HTTP_200_OK
     )
 
 
@@ -40,10 +48,12 @@ def mark_notification_read(request, notification_id):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # User can only modify their own notification
     if notification.user_id != str(request.user.id):
         return Response(
-            {"detail": "You can only modify your own notifications."},
+            {
+                "detail":
+                "You can only modify your own notifications."
+            },
             status=status.HTTP_403_FORBIDDEN
         )
 
@@ -51,7 +61,8 @@ def mark_notification_read(request, notification_id):
     notification.save()
 
     return Response(
-        NotificationSerializer(notification).data
+        NotificationSerializer(notification).data,
+        status=status.HTTP_200_OK
     )
 
 
@@ -59,7 +70,6 @@ def mark_notification_read(request, notification_id):
 @permission_classes([IsAuthenticated])
 def mark_all_read(request):
 
-    # Only mark notifications belonging to logged-in user
     Notification.objects(
         user_id=str(request.user.id),
         is_read=False
@@ -69,6 +79,9 @@ def mark_all_read(request):
 
     return Response(
         {
-            "message": "All notifications marked as read."
-        }
+            "message":
+            "All notifications marked as read.",
+            "unread_count": 0
+        },
+        status=status.HTTP_200_OK
     )
