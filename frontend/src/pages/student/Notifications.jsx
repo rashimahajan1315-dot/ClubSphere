@@ -14,7 +14,6 @@ export default function Notifications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-
   const loadNotifications = async () => {
     if (!user?.id) {
       setLoading(false);
@@ -27,7 +26,10 @@ export default function Notifications() {
 
       const data = await fetchNotifications(user.id);
 
-      setNotifications(data);
+      // Backend returns:
+      // { notifications: [...], unread_count: number }
+      setNotifications(data.notifications || []);
+
     } catch (err) {
       setError(
         err.response?.data?.detail ||
@@ -38,11 +40,9 @@ export default function Notifications() {
     }
   };
 
-
   useEffect(() => {
     loadNotifications();
   }, [user]);
-
 
   const handleRead = async (id) => {
     try {
@@ -66,7 +66,6 @@ export default function Notifications() {
     }
   };
 
-
   const handleMarkAllRead = async () => {
     if (!user?.id) return;
 
@@ -87,16 +86,13 @@ export default function Notifications() {
     }
   };
 
-
   const unreadCount = notifications.filter(
     (notification) => !notification.is_read
   ).length;
 
-
   if (loading) {
     return <Loader />;
   }
-
 
   return (
     <div className="page-container">
@@ -116,7 +112,6 @@ export default function Notifications() {
 
         </div>
 
-
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
@@ -128,13 +123,11 @@ export default function Notifications() {
 
       </div>
 
-
       {error && (
         <p className="text-red-600 text-sm mb-4">
           {error}
         </p>
       )}
-
 
       <div className="flex flex-col gap-3">
 
@@ -161,7 +154,6 @@ export default function Notifications() {
                 {notification.message}
               </p>
 
-
               <p className="text-xs text-gray-400 mt-2">
 
                 {notification.created_at
@@ -173,7 +165,6 @@ export default function Notifications() {
               </p>
 
             </div>
-
 
             {!notification.is_read && (
 
@@ -191,7 +182,6 @@ export default function Notifications() {
           </div>
 
         ))}
-
 
         {notifications.length === 0 && (
 
