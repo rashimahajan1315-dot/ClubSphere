@@ -1,5 +1,29 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+
+const navLinks = {
+  student: [
+    { label: "Dashboard", to: "/student/dashboard" },
+    { label: "Explore Clubs", to: "/student/clubs" },
+    { label: "Applications", to: "/student/applications" },
+    { label: "Notifications", to: "/student/notifications" },
+  ],
+  club_admin: [
+    { label: "Dashboard", to: "/club-admin/dashboard" },
+    { label: "Club Profile", to: "/club-admin/profile" },
+    { label: "Recruitments", to: "/club-admin/recruitments" },
+    { label: "Applications", to: "/club-admin/applications" },
+    { label: "Notifications", to: "/club-admin/notifications" },
+  ],
+  central_admin: [
+    { label: "Dashboard", to: "/central-admin/dashboard" },
+    { label: "Clubs", to: "/central-admin/clubs" },
+    { label: "Recruitments", to: "/central-admin/recruitments" },
+    { label: "Applications", to: "/central-admin/applications" },
+    { label: "Users", to: "/central-admin/users" },
+  ],
+};
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -10,153 +34,73 @@ export default function Navbar() {
     navigate("/login");
   };
 
+  const links = navLinks[user?.role] || [];
+
   return (
-    <nav className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-
-        <Link
-          to="/"
-          className="text-2xl font-extrabold text-brand-700"
-        >
-          ClubSphere
-        </Link>
-
-        <div className="flex items-center gap-5">
-
-          {!isAuthenticated ? (
-            <Link
-              to="/login"
-              className="btn-primary"
-            >
-              Login
-            </Link>
-          ) : (
-            <>
-              {user?.role === "student" && (
-                <>
-                  <Link
-                    to="/student/dashboard"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Dashboard
-                  </Link>
-
-                  <Link
-                    to="/student/clubs"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Explore Clubs
-                  </Link>
-
-                  <Link
-                    to="/student/applications"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Applications
-                  </Link>
-
-                  <Link
-                    to="/student/notifications"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Notifications
-                  </Link>
-                </>
-              )}
-
-              {user?.role === "club_admin" && (
-                <>
-                  <Link
-                    to="/club-admin/dashboard"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Dashboard
-                  </Link>
-
-                  <Link
-                    to="/club-admin/profile"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Club Profile
-                  </Link>
-
-                  <Link
-                    to="/club-admin/recruitments"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Recruitments
-                  </Link>
-
-                  <Link
-                    to="/club-admin/applications"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Applications
-                  </Link>
-
-                  <Link
-                    to="/club-admin/notifications"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Notifications
-                  </Link>
-                </>
-              )}
-
-              {user?.role === "central_admin" && (
-                <>
-                  <Link
-                    to="/central-admin/dashboard"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Dashboard
-                  </Link>
-
-                  <Link
-                    to="/central-admin/clubs"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Clubs
-                  </Link>
-
-                  <Link
-                    to="/central-admin/recruitments"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Recruitments
-                  </Link>
-
-                  <Link
-                    to="/central-admin/applications"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Applications
-                  </Link>
-
-                  <Link
-                    to="/central-admin/users"
-                    className="text-gray-600 hover:text-brand-600 font-medium"
-                  >
-                    Users
-                  </Link>
-                </>
-              )}
-
-              <span className="text-sm text-gray-500">
-                {user?.name}
-              </span>
-
-              <button
-                onClick={handleLogout}
-                className="btn-secondary"
-              >
-                Logout
-              </button>
-            </>
-          )}
-
+    <>
+      <div className="cs-top-strip">
+        <div className="cs-top-inner">
+          MIT World Peace University · Pune
+          <span>Student Clubs & Campus Life</span>
         </div>
       </div>
-    </nav>
+
+      <header className="cs-navbar">
+        <div className="cs-navbar-inner">
+          <Link to="/" className="cs-brand" aria-label="ClubSphere home">
+            <span className="cs-brand-mark">C</span>
+            <span className="cs-brand-copy">
+              <strong>ClubSphere</strong>
+              <small>YOUR CAMPUS. YOUR COMMUNITY.</small>
+            </span>
+          </Link>
+
+          <nav className="cs-nav-links" aria-label="Main navigation">
+            {isAuthenticated ? (
+              links.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="cs-nav-link"
+                >
+                  {item.label}
+                </Link>
+              ))
+            ) : (
+              <Link to="/login" className="cs-nav-link">
+                Home
+              </Link>
+            )}
+          </nav>
+
+          <div className="cs-nav-actions">
+            {isAuthenticated ? (
+              <>
+                <span className="cs-user-chip">
+                  <span className="cs-user-avatar">
+                    {(user?.name || "U").charAt(0).toUpperCase()}
+                  </span>
+                  <span className="cs-user-name">
+                    {user?.name || "User"}
+                  </span>
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="cs-logout-btn"
+                >
+                  Logout <span aria-hidden="true">↗</span>
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="cs-login-btn">
+                Sign in <span aria-hidden="true">→</span>
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
