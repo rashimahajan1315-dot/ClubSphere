@@ -1,106 +1,42 @@
-
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-
-const navLinks = {
-  student: [
-    { label: "Dashboard", to: "/student/dashboard" },
-    { label: "Explore Clubs", to: "/student/clubs" },
-    { label: "Applications", to: "/student/applications" },
-    { label: "Notifications", to: "/student/notifications" },
-  ],
-  club_admin: [
-    { label: "Dashboard", to: "/club-admin/dashboard" },
-    { label: "Club Profile", to: "/club-admin/profile" },
-    { label: "Recruitments", to: "/club-admin/recruitments" },
-    { label: "Applications", to: "/club-admin/applications" },
-    { label: "Notifications", to: "/club-admin/notifications" },
-  ],
-  central_admin: [
-    { label: "Dashboard", to: "/central-admin/dashboard" },
-    { label: "Clubs", to: "/central-admin/clubs" },
-    { label: "Recruitments", to: "/central-admin/recruitments" },
-    { label: "Applications", to: "/central-admin/applications" },
-    { label: "Users", to: "/central-admin/users" },
-  ],
-};
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const handleLogout = () => { logout(); navigate("/login", { replace: true }); };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
-  const links = navLinks[user?.role] || [];
+  const links = user?.role === "student" ? [
+    ["Dashboard", "/student/dashboard"], ["Explore Clubs", "/student/clubs"],
+    ["Applications", "/student/applications"], ["Notifications", "/student/notifications"],
+  ] : user?.role === "club_admin" ? [
+    ["Dashboard", "/club-admin/dashboard"], ["Club Profile", "/club-admin/profile"],
+    ["Recruitments", "/club-admin/recruitments"], ["Applications", "/club-admin/applications"],
+    ["Notifications", "/club-admin/notifications"],
+  ] : user?.role === "central_admin" ? [
+    ["Dashboard", "/central-admin/dashboard"], ["Clubs", "/central-admin/clubs"],
+    ["Recruitments", "/central-admin/recruitments"], ["Applications", "/central-admin/applications"],
+    ["Users", "/central-admin/users"],
+  ] : [];
 
   return (
-    <>
-      <div className="cs-top-strip">
-        <div className="cs-top-inner">
-          MIT World Peace University · Pune
-          <span>Student Clubs & Campus Life</span>
+    <nav className="app-navbar">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-5">
+        <Link to="/" className="brand-lockup" aria-label="ClubSphere home">
+          <span className="brand-mark">C</span>
+          <span className="brand-copy"><strong>ClubSphere</strong><small>MIT-WPU · CAMPUS COMMUNITY</small></span>
+        </Link>
+        {isAuthenticated && <div className="nav-links">
+          {links.map(([label, path]) => <Link key={path} to={path} className={location.pathname === path || location.pathname.startsWith(path + "/") ? "nav-link active" : "nav-link"}>{label}</Link>)}
+        </div>}
+        <div className="nav-account">
+          {isAuthenticated ? <>
+            <span className="nav-user">{user?.name || (user?.role || "User").replace("_", " ")}</span>
+            <button onClick={handleLogout} className="btn-secondary nav-logout">Logout</button>
+          </> : <Link to="/login" className="btn-primary">Login</Link>}
         </div>
       </div>
-
-      <header className="cs-navbar">
-        <div className="cs-navbar-inner">
-          <Link to="/" className="cs-brand" aria-label="ClubSphere home">
-            <span className="cs-brand-mark">C</span>
-            <span className="cs-brand-copy">
-              <strong>ClubSphere</strong>
-              <small>YOUR CAMPUS. YOUR COMMUNITY.</small>
-            </span>
-          </Link>
-
-          <nav className="cs-nav-links" aria-label="Main navigation">
-            {isAuthenticated ? (
-              links.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="cs-nav-link"
-                >
-                  {item.label}
-                </Link>
-              ))
-            ) : (
-              <Link to="/login" className="cs-nav-link">
-                Home
-              </Link>
-            )}
-          </nav>
-
-          <div className="cs-nav-actions">
-            {isAuthenticated ? (
-              <>
-                <span className="cs-user-chip">
-                  <span className="cs-user-avatar">
-                    {(user?.name || "U").charAt(0).toUpperCase()}
-                  </span>
-                  <span className="cs-user-name">
-                    {user?.name || "User"}
-                  </span>
-                </span>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="cs-logout-btn"
-                >
-                  Logout <span aria-hidden="true">↗</span>
-                </button>
-              </>
-            ) : (
-              <Link to="/login" className="cs-login-btn">
-                Sign in <span aria-hidden="true">→</span>
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
-    </>
+    </nav>
   );
 }
