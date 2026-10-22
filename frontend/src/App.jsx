@@ -25,6 +25,7 @@ import AdminClubDetails from "./pages/central-admin/ClubDetails.jsx";
 import AdminRecruitments from "./pages/central-admin/Recruitments.jsx";
 import AdminApplications from "./pages/central-admin/Applications.jsx";
 import AdminUsers from "./pages/central-admin/Users.jsx";
+import AdminNotifications from "./pages/central-admin/Notifications.jsx";
 
 import "./App.css";
 import React from "react";
@@ -318,6 +319,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute roles={["central_admin"]}>
               <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/central-admin/notifications"
+          element={
+            <ProtectedRoute roles={["central_admin"]}>
+              <AdminNotifications />
             </ProtectedRoute>
           }
         />
