@@ -68,6 +68,7 @@ function HomeRedirect() {
 }
 
 
+// Redesigned Login Page
 function LoginPage() {
   const { login, loading } = useAuth();
   const [error, setError] = React.useState("");
@@ -154,8 +155,7 @@ function AppRoutes() {
         />
 
 
-        {/* ================= STUDENT ================= */}
-
+        {/* STUDENT ROUTES */}
         <Route
           path="/student/dashboard"
           element={
@@ -211,8 +211,7 @@ function AppRoutes() {
         />
 
 
-        {/* ================= CLUB ADMIN ================= */}
-
+        {/* CLUB ADMIN ROUTES */}
         <Route
           path="/club-admin/dashboard"
           element={
@@ -268,8 +267,7 @@ function AppRoutes() {
         />
 
 
-        {/* ================= CENTRAL ADMIN ================= */}
-
+        {/* CENTRAL ADMIN ROUTES */}
         <Route
           path="/central-admin/dashboard"
           element={
@@ -326,7 +324,6 @@ function AppRoutes() {
 
 
         {/* UNKNOWN URL */}
-
         <Route
           path="*"
           element={<HomeRedirect />}
@@ -347,6 +344,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
 
 export default App;

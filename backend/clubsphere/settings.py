@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,14 +11,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "dev-only-change-this-secret-key"
+    "dev-only-change-this-secret-key",
 )
 
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "backend",
 ]
 
 
@@ -26,19 +28,14 @@ ALLOWED_HOSTS = [
 # ============================================================
 
 INSTALLED_APPS = [
-    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # Third-party
     "rest_framework",
     "corsheaders",
-
-    # ClubSphere apps
     "users",
     "clubs",
     "recruitments",
@@ -53,9 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-
     "corsheaders.middleware.CorsMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -65,7 +60,13 @@ MIDDLEWARE = [
 ]
 
 
+# ============================================================
+# URL CONFIGURATION
+# ============================================================
+
 ROOT_URLCONF = "clubsphere.urls"
+
+WSGI_APPLICATION = "clubsphere.wsgi.application"
 
 
 # ============================================================
@@ -88,16 +89,11 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = "clubsphere.wsgi.application"
-
-
 # ============================================================
-# DATABASE
+# DJANGO DATABASE
 # ============================================================
-
-# Django's internal database.
-# ClubSphere application data will be stored in MongoDB
-# through MongoEngine.
+# Django's built-in components use SQLite.
+# ClubSphere application data uses MongoDB through MongoEngine.
 
 DATABASES = {
     "default": {
@@ -111,9 +107,19 @@ DATABASES = {
 # MONGODB
 # ============================================================
 
+MONGODB_DATABASE = os.environ.get(
+    "MONGODB_DATABASE",
+    "clubsphere",
+)
+
+MONGODB_HOST = os.environ.get(
+    "MONGODB_HOST",
+    "mongodb://127.0.0.1:27017/clubsphere",
+)
+
 MONGODB_SETTINGS = {
-    "db": "clubsphere",
-    "host": "mongodb://localhost:27017/clubsphere",
+    "db": MONGODB_DATABASE,
+    "host": MONGODB_HOST,
 }
 
 
@@ -134,8 +140,6 @@ REST_FRAMEWORK = {
 # ============================================================
 # JWT
 # ============================================================
-
-from datetime import timedelta
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
@@ -160,16 +164,28 @@ CORS_ALLOWED_ORIGINS = [
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "MinimumLengthValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "NumericPasswordValidator"
+        ),
     },
 ]
 
@@ -183,6 +199,7 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
+
 USE_TZ = True
 
 

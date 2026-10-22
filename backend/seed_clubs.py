@@ -8,8 +8,11 @@ from recruitments.models import Recruitment
 
 # Connect to ClubSphere MongoDB
 mongoengine.connect(
-    db="clubsphere",
-    host="mongodb://127.0.0.1:27017/clubsphere"
+    db=os.environ.get("MONGODB_DATABASE", "clubsphere"),
+    host=os.environ.get(
+        "MONGODB_HOST",
+        "mongodb://127.0.0.1:27017/clubsphere",
+    ),
 )
 
 
