@@ -4,6 +4,7 @@ import { fetchClub } from "../../api/clubs";
 import { fetchRecruitments } from "../../api/recruitments";
 import RecruitmentCard from "../../components/RecruitmentCard.jsx";
 import Loader from "../../components/Loader.jsx";
+import ClubLogo from "../../components/ClubLogo.jsx";
 
 export default function ClubDetails() {
   const { id } = useParams();
@@ -59,25 +60,9 @@ export default function ClubDetails() {
   return (
     <div className="page-container">
 
-      <div className="card flex flex-col sm:flex-row gap-5 items-start mb-8">
+      <div className="card club-detail-hero flex flex-col sm:flex-row gap-5 items-start mb-8">
 
-        <div className="w-20 h-20 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center text-3xl font-bold overflow-hidden shrink-0">
-
-          {club.logo ? (
-
-            <img
-              src={club.logo}
-              alt={club.name}
-              className="w-full h-full object-cover"
-            />
-
-          ) : (
-
-            club.name.charAt(0)
-
-          )}
-
-        </div>
+        <ClubLogo club={club} size="large" />
 
 
         <div>
