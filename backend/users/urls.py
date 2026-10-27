@@ -11,6 +11,14 @@ urlpatterns = [
         name="admin-user-list"
     ),
 
+    
+path(
+    "admin/create-club-admin/",
+    views.create_club_admin,
+    name="create-club-admin",
+),
+
+
     path(
         "admin/stats/",
         views.admin_stats,
