@@ -1,62 +1,146 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { fetchStats } from '../../api/notifications'
-import Loader from '../../components/Loader.jsx'
+
+import { useEffect, useState } from "react";
+import apiClient from "../../api/apiClient";
+import Loader from "../../components/Loader.jsx";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  
+
+  const loadStats = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await apiClient.get("/users/admin/stats/");
+      setStats(response.data);
+    } catch (err) {
+      setError(
+        err?.response?.data?.detail ||
+          "Could not load dashboard statistics."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchStats().then(setStats).finally(() => setLoading(false))
-  }, [])
+    loadStats();
+  }, []);
 
-  if (loading) return <Loader />
-  if (!stats) return null
+  if (loading) return <Loader />;
 
-  const cards = [
-    { label: 'Total Clubs', value: stats.total_clubs, link: '/central-admin/clubs' },
-    { label: 'Students', value: stats.total_students },
-    { label: 'Club Admins', value: stats.total_club_admins, link: '/central-admin/users' },
-    { label: 'Active Recruitments', value: stats.active_recruitments, link: '/central-admin/recruitments' },
-    { label: 'Total Recruitments', value: stats.total_recruitments },
-    { label: 'Total Applications', value: stats.total_applications, link: '/central-admin/applications' },
-  ]
+  if (error) {
+    return (
+      <div className="page-container">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Central Admin Dashboard
+        </h1>
+
+        <div
+          role="alert"
+          className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"
+        >
+          {error}
+          <button
+            type="button"
+            onClick={loadStats}
+            className="ml-3 underline"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const sections = [
+    {
+      title: "Users",
+      values: [
+        ["Total Users", stats?.users?.total],
+        ["Students", stats?.users?.students],
+        ["Club Admins", stats?.users?.club_admins],
+        ["Central Admins", stats?.users?.central_admins],
+      ],
+    },
+    {
+      title: "Clubs",
+      values: [
+        ["Total Clubs", stats?.clubs?.total],
+        ["Approved", stats?.clubs?.approved],
+        ["Pending", stats?.clubs?.pending],
+        ["Rejected", stats?.clubs?.rejected],
+      ],
+    },
+    {
+      title: "Recruitments",
+      values: [
+        ["Total Recruitments", stats?.recruitments?.total],
+        ["Open", stats?.recruitments?.open],
+        ["Closed", stats?.recruitments?.closed],
+      ],
+    },
+    {
+      title: "Applications",
+      values: [
+        ["Total Applications", stats?.applications?.total],
+        ["Applied", stats?.applications?.applied],
+        ["Under Review", stats?.applications?.under_review],
+        ["Shortlisted", stats?.applications?.shortlisted],
+        ["Selected", stats?.applications?.selected],
+        ["Rejected", stats?.applications?.rejected],
+      ],
+    },
+  ];
 
   return (
     <div className="page-container">
-      <h1 className="text-2xl font-bold text-gray-800 mb-1">Central Admin Dashboard</h1>
-      <p className="text-gray-500 mb-6">Official oversight of every club, recruitment, and application.</p>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="mb-1 text-sm text-brand-600">CENTRAL ADMIN</p>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-gray-500">
+            Overview of users, clubs, recruitments and applications.
+          </p>
+        </div>
 
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
-        {cards.map((c) => {
-          const Wrapper = c.link ? Link : 'div'
-          return (
-            <Wrapper key={c.label} to={c.link} className="card text-center hover:shadow-md transition-shadow">
-              <p className="text-3xl font-extrabold text-brand-700">{c.value}</p>
-              <span className="text-sm text-gray-500">{c.label}</span>
-            </Wrapper>
-          )
-        })}
+        <button
+          type="button"
+          onClick={loadStats}
+          className="btn-secondary"
+        >
+          Refresh
+        </button>
       </div>
 
-      <div className="card">
-        <h2 className="font-bold text-gray-800 mb-4">Application Status Breakdown</h2>
-        <div className="flex flex-col gap-3">
-          {Object.entries(stats.status_breakdown).map(([status, count]) => {
-            const max = Math.max(...Object.values(stats.status_breakdown), 1)
-            return (
-              <div key={status} className="flex items-center gap-3">
-                <span className="w-32 text-sm text-gray-600">{status}</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                  <div className="bg-brand-600 h-3 rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {sections.map((section) => (
+          <section key={section.title} className="card">
+            <h2 className="mb-4 text-lg font-semibold text-gray-800">
+              {section.title}
+            </h2>
+
+            <div className="grid grid-cols-2 gap-3">
+              {section.values.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-lg bg-gray-50 p-3"
+                >
+                  <p className="text-sm text-gray-500">{label}</p>
+                  <p className="mt-1 text-2xl font-semibold text-gray-800">
+                    {typeof value === "number" ? value : "—"}
+                  </p>
                 </div>
-                <span className="w-8 text-sm text-gray-700 font-semibold text-right">{count}</span>
-              </div>
-            )
-          })}
-        </div>
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
-  )
+  );
 }
