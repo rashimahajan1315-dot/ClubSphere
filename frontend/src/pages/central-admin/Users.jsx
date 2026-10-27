@@ -4,6 +4,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  assignClubAdmin,
 } from "../../api/auth";
 import { fetchClubs } from "../../api/clubs";
 
@@ -124,27 +125,26 @@ export default function Users() {
   };
 
 
-  const handleClubAssign = async (
-    userId,
-    clubId
-  ) => {
+  
+const handleClubAssign = async (userId, clubId) => {
+  if (!clubId) {
+    setError("Please select a club to assign.");
+    return;
+  }
 
-    try {
+  try {
+    setError("");
 
-      await updateUser(userId, {
-        club_id: clubId || null,
-      });
-
-      await loadUsers();
-
-    } catch (err) {
-
-      setError(
-        err.response?.data?.detail ||
+    await assignClubAdmin(userId, clubId);
+    await loadUsers();
+  } catch (err) {
+    setError(
+      err.response?.data?.detail ||
         "Failed to assign club."
-      );
+    );
+  }
 
-    }
+
   };
 
 
