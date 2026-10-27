@@ -1,58 +1,31 @@
+
 import apiClient from "./apiClient";
 
-
-export async function registerUser(
-  name,
-  email,
-  password
-) {
-  const response = await apiClient.post(
-    "/users/register/",
-    {
-      name,
-      email,
-      password,
-    }
-  );
+export async function registerUser(name, email, password) {
+  const response = await apiClient.post("/users/register/", {
+    name,
+    email,
+    password,
+  });
 
   return response.data;
 }
 
-
-export async function loginUser(
-  email,
-  password
-) {
-  const response = await apiClient.post(
-    "/users/login/",
-    {
-      email,
-      password,
-    }
-  );
+export async function loginUser(email, password) {
+  const response = await apiClient.post("/users/login/", {
+    email,
+    password,
+  });
 
   return response.data;
 }
 
+// Central Admin user management
 
-/*
-  These functions are used by the
-  Central Admin Users page.
-
-  They will connect to the admin
-  user-management endpoints that
-  we'll add to the backend.
-*/
-
-export async function fetchUsers(
-  params = {}
-) {
-  const response = await apiClient.get(
-    "/users/",
-    {
-      params,
-    }
-  );
+export async function fetchUsers(params = {}) {
+  const response = await apiClient.get("/users/admin/", {
+    params,
+  });
 
   return response.data;
 }
@@ -60,7 +33,7 @@ export async function fetchUsers(
 
 export async function createUser(data) {
   const response = await apiClient.post(
-    "/users/",
+    "/users/admin/create-club-admin/",
     data
   );
 
@@ -68,23 +41,28 @@ export async function createUser(data) {
 }
 
 
-export async function updateUser(
-  id,
-  data
-) {
+export async function updateUser(id, data) {
   const response = await apiClient.patch(
-    `/users/${id}/`,
+    `/users/admin/${id}/status/`,
     data
   );
 
   return response.data;
 }
 
+
+export async function assignClubAdmin(userId, clubId) {
+  const response = await apiClient.patch(
+    `/users/admin/${userId}/assign-club/`,
+    {
+      club_id: clubId,
+    }
+  );
+
+  return response.data;
+}
 
 export async function deleteUser(id) {
-  const response = await apiClient.delete(
-    `/users/${id}/`
-  );
-
+  const response = await apiClient.delete(`/users/admin/${id}/`);
   return response.data;
 }
